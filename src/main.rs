@@ -5,8 +5,8 @@ fn run() {
     //function to display the help menu which would be called when the user types "help" or "-h"
     fn help() {
         println!("Available Commands:");
-        println!("  help    or  -h    Show this help message");
-        println!("  exit       Exit the application");
+        println!("  help    or  -h  ----  Show this help message");
+        println!("  exit       ----  Exit the application");
         // Future commands can be listed here as you add them
     }
 
