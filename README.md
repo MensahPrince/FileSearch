@@ -16,7 +16,7 @@
 
 ```toml
 [dependencies]
-walkdir = "2"
+walkdir = "2.5.0"
 ```
 Build the project: cargo build. 
 
