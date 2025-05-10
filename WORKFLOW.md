@@ -51,6 +51,21 @@ impl parser{
             config_options = default_config()
         }
     }
-    
+}
+
+function parse(input_string) -> command{
+    keyword = sliced input_string containing command. 
+    path = sliced input_string containind the path. 
+    math keyword{
+        "cd"{
+            return command::cd(path)
+        }
+        "ls"{
+            return command Ls 
+        }
+        _{
+            return message: Not recognized as an internal or external command
+        }
+    }
 }
 ```
