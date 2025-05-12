@@ -3,10 +3,10 @@
 # FSearch
 ## Features
 
-- Surf directories 
+- Surf directories ✅
 - Recursively walks through a directory
 - Prints out the full path of each file and subdirectory
-- Basic error handling for unreadable files or folders
+- Basic error handling for unreadable files or folders ✅
 
 ## Usage for version 0.1.0
 
