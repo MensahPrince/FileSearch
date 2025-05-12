@@ -1,77 +1,114 @@
-## 🧰 Workflow for Version 0.1.0 (Initial CLI Version)
+# 🧰 FileSearch CLI – Version 0.1.0
 
-### 📦 Key Imports
+## Overview
+
+A minimal shell-like CLI built in Rust that currently supports basic commands like `cd` and `ls`, with a parser system designed to scale easily as more commands are added.
+
+---
+
+## 📦 Key Imports
 
 ```rust
-use std::env::set_current_dir;           // Change the current working directory
-use std::env::current_dir;               // Get the current working directory
-use std::io::stdin;                      // Read terminal input
-use walkdir::WalkDir;                    // Traverse directories and their descendants
+use std::env::{current_dir, set_current_dir}; // Handle working directories
+use std::io::{stdin, stdout, Write};          // Handle user input/output
+use walkdir::WalkDir;                          // For directory traversal
 ```
 
 ---
 
-### 🧠 Pseudocode: Core Command Loop
+## 🔄 Core Command Loop – Pseudocode
 
 ```pseudocode
 loop {
-    print current directory
-    read input
+    display_current_prompt()         // Print current working directory as shell prompt
+    user_input = read_input_line()   // Read user input from stdin
+
+    if user_input is empty:
+        continue
+
+    if user_input is "exit" or "quit":
+        break                        // Terminate application
+
+    command = Parser::parse(user_input)
+
     match command:
-        - "cd <path>": change directory         // Change the working directory
-        - "ls": list files in current dir       // Display contents using WalkDir
-        - "exit" or "quit": break               // Exit the application
-        - invalid: print error                  // Handle unknown or malformed input
+        Command::Cd(path) => change_directory(path)
+        Command::Ls       => list_directory_contents()
+        _                 => print "Unknown command"
 }
 ```
-## Expanded Core command loop with context.
+
+---
+
+## 🧩 Parser Design
+
+The parser interprets user input by separating the keyword from arguments and turning it into structured `Command` enums. This makes command handling modular and extendable.
+
+### ✅ Supported Commands
+
+- `cd <path>` – Change the current working directory
+- `ls` – List files and folders in the current directory
+- `exit` or `quit` – Exit the CLI
+
+---
+
+## 🧠 Parser Pseudocode
+
 ```pseudocode
-
-
-
-```
-
-# PARSER
-### This is a parser to take in user commands with arguments, break them down before fsearch executes them 
-### I find this method more convenient than using other conventional methods like If-else statements or match cases.
-
-```pseudocode 
-
-enum commands{
-    cd (path)
-    ls 
-    //Limited to two commands for now. 
+enum Command {
+    Cd(path)
+    Ls
+    // Additional commands can be added here
 }
 
-struct parser{
-    curr_dir 
-    config_options 
+struct Parser {
+    // Optional fields for config, state, or current dir
 }
 
-//Implementations for the parser
-impl parser{
-    //constructor to initialize the parser
-    function new() -> parser{
-        return parser{
-            curr_dir = get_curr_dir();
-            config_options = default_config()
+impl Parser {
+    function new() -> Parser {
+        return Parser {
+            // Initialize internal state if needed
         }
     }
-}
 
-function parse(input_string) -> command{
-    keyword = sliced input_string containing command. 
-    path = sliced input_string containind the path. 
-    math keyword{
-        "cd"{
-            return command::cd(path)
-        }
-        "ls"{
-            return command Ls 
-        }
-        _{
-            return message: Not recognized as an internal or external command
-        }
+    function parse(input_string) -> Command {
+        words = split input_string by whitespace
+
+        if words[0] == "cd" and length(words) > 1:
+            return Command::Cd(words[1])
+        else if words[0] == "ls":
+            return Command::Ls
+        else:
+            return error("Unrecognized command")
     }
 }
 ```
+
+---
+
+## 🗃️ Project Structure
+
+```
+FileSearch/
+├── src/
+│   ├── main.rs        // Main CLI logic
+│   └── parser.rs      // Command parser module
+├── Cargo.toml         // Rust project metadata
+└── README.md          // This file
+```
+
+---
+
+## 🚀 Future Work
+
+- Add support for more shell commands (e.g., `mkdir`, `rm`, `touch`)
+- Implement command history
+- Add autocompletion
+- Improve error handling with custom error types
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
