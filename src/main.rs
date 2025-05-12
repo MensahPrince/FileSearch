@@ -1,51 +1,92 @@
 use std::env::current_dir;
 use std::io::{self, Write};
 
-fn run() {
-    //function to display the help menu which would be called when the user types "help" or "-h"
-    fn help() {
-        println!("Available Commands:");
-        println!("  help    or  -h    Show this help message");
-        println!("  exit       Exit the application");
-        // Future commands can be listed here as you add them
-    }
+mod parser;
+use parser::{Parser, Command};
 
-    //A function to return the current working directory
-    fn curr_dir_rtn(){
-        let curr_dir = current_dir().unwrap(); // Get the current working directory
-        print!("{} ", format!("fsearch@host:{}$ ", curr_dir.display())); // Prompt
-        io::stdout().flush().unwrap(); // Flush the output so it appears before input
-    }
+// Display help menu
+fn help() {
+    println!("Available Commands:");
+    println!("  help    or  -h  ----  Show this help message");
+    println!("  exit       ----  Exit the application");
+    println!("  cd <path>  ----  Change current directory");
+    println!("  ls         ----  List contents of the current directory");
+}
 
+// Display current working directory prompt
+fn curr_dir_rtn() {
+    // Get the current working directory
+    let curr_dir = current_dir().unwrap();
+    print!("{} ", format!("fsearch@host:{}$ ", curr_dir.display()));
+    io::stdout().flush().unwrap();
+}
+
+fn main() {
+    //Parser Instance & initialization
+    let parser = Parser::new();
+
+    //Main working loop.
     loop {
+        //function to display the current working directory
         curr_dir_rtn();
-        let mut read_dir = String::new(); // Reset input string every loop
-        io::stdin()
-            .read_line(&mut read_dir)
-            .expect("Failed to read line");
 
-        let input = read_dir.trim(); // Trim whitespace
-        //Match the input
-        match input {
-            "exit" => {
-                println!("Exiting...");
-                break; // Exit the loop
+        //A mutable to store user input
+        let mut input_line = String::new();
+        //Read user Input
+        io::stdin().read_line(&mut input_line).expect("Failed to read line");
+        //Trim the input of whitespaces
+        let trimmed_input = input_line.trim();
+
+        //Check if the trimmed user input is exit, if so break the loop.
+        if trimmed_input == "exit" {
+            println!("Exiting...");
+            break;
+        }
+
+        //If the user input is help  or -h, show the help menu
+        if trimmed_input == "help" || trimmed_input == "-h" {
+            help();
+            continue;
+        }
+
+        //pass the trimmed input to the parser and match the result to the Command enum 
+        //See parser.rs for Command enum and parser implementation
+        match parser.parse(trimmed_input) {
+            //Match the command; if trimmed input is cd <path>, change the directory to the desired path
+            Command::Cd(path) => {
+                // If the path is invalid:
+                if let Err(e) = std::env::set_current_dir(&path) {
+                    // Print the error message
+                    println!("fsearch: cd: {}: {}", path, e);
+                }
+            }//Match the command; if trimmed input is ls, list the contents of the current directory
+            Command::Ls => {
+                // Use the read_dir function to get the directory entries
+                match std::fs::read_dir(".") {
+                    Ok(entries) => {
+                        // Iterate over the entries in the directory and print their names
+                        // Flatten(): Creates an iterator that flattens nested structure.
+                        for entry in entries.flatten() {
+                            // Print the file name of each entry
+                            // to_string_lossy(): Converts the file name to a string, replacing invalid UTF-8 sequences with U+FFFD.
+                            // This is useful for displaying file names that may contain non-UTF-8 characters.
+                            // file_name(): Returns the name of the file as OsString.
+                            // See documentation for more details.
+                            println!("{}", entry.file_name().to_string_lossy());
+                        }
+                    }// If an error occurs while reading the directory:
+                    Err(e) => {
+                        // Print the error message
+                        println!("fsearch: ls error: {}", e);
+                    }
+                }
             }
-            "help" | "-h"=> {
-                help();
-            }
-            "" => {
-                // Do nothing on empty input
-            }
-            _ => {
-                println!("fsearch: Unknown command: {}", input);
+            //Match the command; if trimmed input is invalid, print an error message
+            // This handles any command that doesn't match the defined commands
+            Command::Invalid(cmd) => {
+                // Print an error message for the unrecognized command
+                println!("fsearch: Unknown command '{}'", cmd);
             }
         }
     }
-}
-
-
-
-fn main() {
-    run();
 }

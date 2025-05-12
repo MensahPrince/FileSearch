@@ -24,3 +24,54 @@ loop {
         - invalid: print error                  // Handle unknown or malformed input
 }
 ```
+## Expanded Core command loop with context.
+```pseudocode
+
+
+
+```
+
+# PARSER
+### This is a parser to take in user commands with arguments, break them down before fsearch executes them 
+### I find this method more convenient than using other conventional methods like If-else statements or match cases.
+
+```pseudocode 
+
+enum commands{
+    cd (path)
+    ls 
+    //Limited to two commands for now. 
+}
+
+struct parser{
+    curr_dir 
+    config_options 
+}
+
+//Implementations for the parser
+impl parser{
+    //constructor to initialize the parser
+    function new() -> parser{
+        return parser{
+            curr_dir = get_curr_dir();
+            config_options = default_config()
+        }
+    }
+}
+
+function parse(input_string) -> command{
+    keyword = sliced input_string containing command. 
+    path = sliced input_string containind the path. 
+    math keyword{
+        "cd"{
+            return command::cd(path)
+        }
+        "ls"{
+            return command Ls 
+        }
+        _{
+            return message: Not recognized as an internal or external command
+        }
+    }
+}
+```
