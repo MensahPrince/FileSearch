@@ -24,6 +24,12 @@ loop {
         - invalid: print error                  // Handle unknown or malformed input
 }
 ```
+## Expanded Core command loop with context.
+```pseudocode
+
+
+
+```
 
 # PARSER
 ### This is a parser to take in user commands with arguments, break them down before fsearch executes them 
