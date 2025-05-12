@@ -100,13 +100,6 @@ FileSearch/
 
 ---
 
-## 🚀 Future Work
-
-- Add support for more shell commands (e.g., `mkdir`, `rm`, `touch`)
-- Implement command history
-- Add autocompletion
-- Improve error handling with custom error types
-
 ---
 
 ## 📄 License
