@@ -2,6 +2,12 @@
 name = "fSearch"
 version = "1.1.0"
 edition = "2024"
+authors = ["Prince Mensah Nana mensahp5888@gmail.com"]
+license = "MIT"
+description = "A lightweight CLI tool to search and manage files"
+homepage = "https://github.com/MensahPrince/FileSearch"
+repository = "https://github.com/MensahPrince/FileSearch"
+
 
 [dependencies]
 walkdir = "2.5.0"

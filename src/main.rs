@@ -3,6 +3,7 @@ use std::io::{self, Write};
 
 mod parser;
 use parser::{Parser, Command};
+use walkdir::WalkDir;
 
 // Display help menu
 fn help() {
@@ -11,6 +12,7 @@ fn help() {
     println!("  exit       ----  Exit the application");
     println!("  cd <path>  ----  Change current directory");
     println!("  ls         ----  List contents of the current directory");
+    println!("  find       ----  Search for a file or directory in any given path");
 }
 
 // Display current working directory prompt
@@ -19,6 +21,22 @@ fn curr_dir_rtn() {
     let curr_dir = current_dir().unwrap();
     print!("{} ", format!("fsearch@host:{}$ ", curr_dir.display()));
     io::stdout().flush().unwrap();
+}
+
+fn fnd_dir(name: &str){
+    let curr_dir = std::env::current_dir().unwrap();
+
+    for entry in WalkDir::new(curr_dir)
+        .into_iter()
+        .filter_map(Result::ok)
+        .filter(|e| e.file_type().is_dir())
+        {
+            if let Some(dir_name) = entry.file_name().to_str(){
+                if dir_name == name {
+                    println!("Found directory: {}", entry.path().display());
+                }
+            }
+        }
 }
 
 fn main() {
@@ -80,6 +98,10 @@ fn main() {
                         println!("fsearch: ls error: {}", e);
                     }
                 }
+
+            }
+            Command::Find(name) => {
+                fnd_dir(&name);
             }
             //Match the command; if trimmed input is invalid, print an error message
             // This handles any command that doesn't match the defined commands
