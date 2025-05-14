@@ -2,8 +2,10 @@ use std::env::current_dir;
 use std::io::{self, Write};
 
 mod parser;
+mod banner;
 use parser::{Parser, Command};
 use walkdir::WalkDir;
+use banner::print_banner;
 
 // Display help menu
 fn help() {
@@ -13,22 +15,50 @@ fn help() {
     println!("  cd <path>  ----  Change current directory");
     println!("  ls         ----  List contents of the current directory");
     println!("  find       ----  Search for a file or directory in any given path");
+    println!("  -dir <name>  ----  Used together with \"find\" to search for a directory in the current directory");
+    println!("  -f <name>  ----  Used together with \"find\" to search for a file in the current directory");
 }
 
 // Display current working directory prompt
 fn curr_dir_rtn() {
     // Get the current working directory
     let curr_dir = current_dir().unwrap();
-    print!("{} ", format!("fsearch@host:{}$ ", curr_dir.display()));
+    print!("{} ", format!("fsearch@host:{}$", curr_dir.display()));
     io::stdout().flush().unwrap();
 }
 
-fn fnd_dir(name: &str){
+fn fnd_file(name: &str){
+    //A path variable to hold the path of the current (parent) dir
     let curr_dir = std::env::current_dir().unwrap();
 
+    //For loop: to loop through the children dirs of the parent dir (curr_dir)
     for entry in WalkDir::new(curr_dir)
+        //Creates an iterator from a value.
         .into_iter()
+        //Creates an iterator that both filters and maps.
         .filter_map(Result::ok)
+        //Creates an iterator which uses a closure to determine if an element should be yielded.
+        .filter(|e| e.file_type().is_file())
+        {
+            if let Some(file_name) = entry.file_name().to_str(){
+                if file_name == name {
+                    println!("Found file: {}", entry.path().display());
+                }
+            }
+        }
+}
+//A function to find a child directory in its parent dir.
+fn fnd_dir(name: &str){
+    //A path variable to hold the path of the current (parent) dir
+    let curr_dir = std::env::current_dir().unwrap();
+
+    //For loop: to loop through the children dirs of the parent dir (curr_dir)
+    for entry in WalkDir::new(curr_dir)
+        //Creates an iterator from a value.
+        .into_iter()
+        //Creates an iterator that both filters and maps.
+        .filter_map(Result::ok)
+        //Creates an iterator which uses a closure to determine if an element should be yielded.
         .filter(|e| e.file_type().is_dir())
         {
             if let Some(dir_name) = entry.file_name().to_str(){
@@ -39,7 +69,15 @@ fn fnd_dir(name: &str){
         }
 }
 
+fn no_cmd(_: ()) {
+    /*
+    This function is used to skip empty input
+    */
+}
+
 fn main() {
+    //Print the banner
+    print_banner();
     //Parser Instance & initialization
     let parser = Parser::new();
 
@@ -100,8 +138,12 @@ fn main() {
                 }
 
             }
-            Command::Find(name) => {
+            Command::FindDir(name) => {
                 fnd_dir(&name);
+            }
+            Command::Empty(_) => {
+                //Do nothing if the input is empty
+                no_cmd(());
             }
             //Match the command; if trimmed input is invalid, print an error message
             // This handles any command that doesn't match the defined commands
@@ -109,6 +151,10 @@ fn main() {
                 // Print an error message for the unrecognized command
                 println!("fsearch: Unknown command '{}'", cmd);
             }
+            Command::FindFile(name) => {
+                fnd_file(&name);
+            }
+            
         }
     }
 }
