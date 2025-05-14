@@ -3,7 +3,8 @@
 pub enum Command {
     Cd(String),
     Ls,
-    Find(String),
+    FindDir(String),
+    FindFile(String),
     //  More commands would be added here as needed,
     Invalid(String), // handle unrecognized input
 }
@@ -25,7 +26,8 @@ impl Parser {
         match tokens.as_slice() {
             ["cd", path] => Command::Cd(path.to_string()),
             ["ls"] => Command::Ls,
-            ["find", "-dir", name ] => Command::Find(name.to_string()),
+            ["find", "-dir", name ] => Command::FindDir(name.to_string()),
+            ["find", "-f", name] => Command::FindFile(name.to_string()),
             [] => Command::Invalid("".to_string()),
             [cmd, ..] => Command::Invalid(cmd.to_string()),
         }

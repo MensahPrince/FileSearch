@@ -19,16 +19,42 @@ fn help() {
 fn curr_dir_rtn() {
     // Get the current working directory
     let curr_dir = current_dir().unwrap();
-    print!("{} ", format!("fsearch@host:{}$ ", curr_dir.display()));
+    print!("{} ", format!("fsearch@host:{}$", curr_dir.display()));
     io::stdout().flush().unwrap();
 }
 
-fn fnd_dir(name: &str){
+fn fnd_file(name: &str){
+    //A path variable to hold the path of the current (parent) dir
     let curr_dir = std::env::current_dir().unwrap();
 
+    //For loop: to loop through the children dirs of the parent dir (curr_dir)
     for entry in WalkDir::new(curr_dir)
+        //Creates an iterator from a value.
         .into_iter()
+        //Creates an iterator that both filters and maps.
         .filter_map(Result::ok)
+        //Creates an iterator which uses a closure to determine if an element should be yielded.
+        .filter(|e| e.file_type().is_file())
+        {
+            if let Some(file_name) = entry.file_name().to_str(){
+                if file_name == name {
+                    println!("Found file: {}", entry.path().display());
+                }
+            }
+        }
+}
+//A function to find a child directory in its parent dir.
+fn fnd_dir(name: &str){
+    //A path variable to hold the path of the current (parent) dir
+    let curr_dir = std::env::current_dir().unwrap();
+
+    //For loop: to loop through the children dirs of the parent dir (curr_dir)
+    for entry in WalkDir::new(curr_dir)
+        //Creates an iterator from a value.
+        .into_iter()
+        //Creates an iterator that both filters and maps.
+        .filter_map(Result::ok)
+        //Creates an iterator which uses a closure to determine if an element should be yielded.
         .filter(|e| e.file_type().is_dir())
         {
             if let Some(dir_name) = entry.file_name().to_str(){
@@ -100,7 +126,7 @@ fn main() {
                 }
 
             }
-            Command::Find(name) => {
+            Command::FindDir(name) => {
                 fnd_dir(&name);
             }
             //Match the command; if trimmed input is invalid, print an error message
@@ -108,6 +134,9 @@ fn main() {
             Command::Invalid(cmd) => {
                 // Print an error message for the unrecognized command
                 println!("fsearch: Unknown command '{}'", cmd);
+            }
+            Command::FindFile(name) => {
+                fnd_file(&name);
             }
         }
     }
