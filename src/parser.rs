@@ -5,7 +5,7 @@ pub enum Command {
     Ls,
     FindDir(String),
     FindFile(String),
-    //  More commands would be added here as needed,
+    Empty(()), // handle empty input
     Invalid(String), // handle unrecognized input
 }
 
@@ -21,6 +21,11 @@ impl Parser {
     // Parse a string input and return a Command
     pub fn parse(&self, input: &str) -> Command {
         let trimmed = input.trim();
+
+        if trimmed.is_empty() {
+            return Command::Empty(());
+        }
+        
         let tokens: Vec<&str> = trimmed.split_whitespace().collect();
 
         match tokens.as_slice() {
@@ -28,6 +33,7 @@ impl Parser {
             ["ls"] => Command::Ls,
             ["find", "-dir", name ] => Command::FindDir(name.to_string()),
             ["find", "-f", name] => Command::FindFile(name.to_string()),
+            ["", ..] => Command::Empty(()),
             [] => Command::Invalid("".to_string()),
             [cmd, ..] => Command::Invalid(cmd.to_string()),
         }

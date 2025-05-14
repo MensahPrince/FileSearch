@@ -65,6 +65,12 @@ fn fnd_dir(name: &str){
         }
 }
 
+fn no_cmd(_: ()) {
+    /*
+    This function is used to skip empty input
+    */
+}
+
 fn main() {
     //Parser Instance & initialization
     let parser = Parser::new();
@@ -129,6 +135,10 @@ fn main() {
             Command::FindDir(name) => {
                 fnd_dir(&name);
             }
+            Command::Empty(_) => {
+                //Do nothing if the input is empty
+                no_cmd(());
+            }
             //Match the command; if trimmed input is invalid, print an error message
             // This handles any command that doesn't match the defined commands
             Command::Invalid(cmd) => {
@@ -138,6 +148,7 @@ fn main() {
             Command::FindFile(name) => {
                 fnd_file(&name);
             }
+            
         }
     }
 }
