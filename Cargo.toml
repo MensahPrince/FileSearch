@@ -11,3 +11,4 @@ repository = "https://github.com/MensahPrince/FileSearch"
 
 [dependencies]
 walkdir = "2.5.0"
+colored = "3"

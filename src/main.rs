@@ -2,8 +2,10 @@ use std::env::current_dir;
 use std::io::{self, Write};
 
 mod parser;
+mod banner;
 use parser::{Parser, Command};
 use walkdir::WalkDir;
+use banner::print_banner;
 
 // Display help menu
 fn help() {
@@ -74,6 +76,8 @@ fn no_cmd(_: ()) {
 }
 
 fn main() {
+    //Print the banner
+    print_banner();
     //Parser Instance & initialization
     let parser = Parser::new();
 
