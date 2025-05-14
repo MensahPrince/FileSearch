@@ -13,6 +13,8 @@ fn help() {
     println!("  cd <path>  ----  Change current directory");
     println!("  ls         ----  List contents of the current directory");
     println!("  find       ----  Search for a file or directory in any given path");
+    println!("  -dir <name>  ----  Used together with \"find\" to search for a directory in the current directory");
+    println!("  -f <name>  ----  Used together with \"find\" to search for a file in the current directory");
 }
 
 // Display current working directory prompt
