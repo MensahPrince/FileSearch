@@ -19,6 +19,7 @@ fn help() {
     println!("  find       ----  Search for a file or directory in any given path");
     println!("  -dir <name>  ----  Used together with \"find\" to search for a directory in the current directory");
     println!("  -f <name>  ----  Used together with \"find\" to search for a file in the current directory");
+    println!("  -ext <extension>  ----  Used together with \"find\" to search for files with a specific extension in the current directory");
 }
 
 // Display current working directory prompt
@@ -75,6 +76,27 @@ fn no_cmd(_: ()) {
     /*
     This function is used to skip empty input
     */
+}
+
+fn find_ext(ext: &str) {
+    //A path variable to hold the path of the current (parent) dir
+    let curr_dir = std::env::current_dir().unwrap();
+
+    //For loop: to loop through the children dirs of the parent dir (curr_dir)
+    for entry in WalkDir::new(curr_dir)
+        //Creates an iterator from a value.
+        .into_iter()
+        //Creates an iterator that both filters and maps.
+        .filter_map(Result::ok)
+        //Creates an iterator which uses a closure to determine if an element should be yielded.
+        .filter(|e| e.file_type().is_file())
+        {
+            if let Some(file_name) = entry.file_name().to_str(){
+                if file_name.ends_with(ext) {
+                    println!("Found file with extension {}: {}", ext, entry.path().display());
+                }
+            }
+        }
 }
 
 fn main() {
@@ -163,7 +185,9 @@ fn main() {
             Command::FindFile(name) => {
                 fnd_file(&name);
             }
-            
+            Command::FindExt(ext) => {
+                find_ext(&ext);
+            } 
         }
     }
 }

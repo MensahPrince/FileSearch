@@ -5,6 +5,7 @@ pub enum Command {
     Ls,
     FindDir(String),
     FindFile(String),
+    FindExt(String),
     Empty(()), // handle empty input
     Invalid(String), // handle unrecognized input
 }
@@ -33,6 +34,7 @@ impl Parser {
             ["ls"] => Command::Ls,
             ["find", "-dir", name ] => Command::FindDir(name.to_string()),
             ["find", "-f", name] => Command::FindFile(name.to_string()),
+            ["find", "-ext", ext] => Command::FindExt(ext.to_string()),
             ["", ..] => Command::Empty(()),
             [] => Command::Invalid("".to_string()),
             [cmd, ..] => Command::Invalid(cmd.to_string()),
