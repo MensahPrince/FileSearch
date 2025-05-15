@@ -1,11 +1,13 @@
 use std::env::current_dir;
 use std::io::{self, Write};
+//use std::fs::Metadata;
 
 mod parser;
 mod banner;
 use parser::{Parser, Command};
 use walkdir::WalkDir;
 use banner::print_banner;
+use colored::*;
 
 // Display help menu
 fn help() {
@@ -128,7 +130,14 @@ fn main() {
                             // This is useful for displaying file names that may contain non-UTF-8 characters.
                             // file_name(): Returns the name of the file as OsString.
                             // See documentation for more details.
-                            println!("{}", entry.file_name().to_string_lossy());
+                            let file_name = entry.file_name();
+                            let dir_color = file_name.to_string_lossy();
+                            //conditional formatting: green if the entry is a directory, otherwise default color
+                            if entry.metadata().unwrap().is_dir(){
+                                println!("{}", dir_color.green().bold());
+                            }else{
+                                println!("{}", dir_color);
+                            }
                         }
                     }// If an error occurs while reading the directory:
                     Err(e) => {
