@@ -28,5 +28,5 @@ Run the project: cargo run.
 
 - Add support for filtering by file extension
 - Add regex-based search for file names
-- Export results to a text file
-- Add colored output for files/folders 
+- Export results to a text file 
+- Add colored output for files/folders ✅
