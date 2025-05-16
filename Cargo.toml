@@ -1,6 +1,6 @@
 [package]
 name = "fSearch"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 authors = ["Prince Mensah Nana mensahp5888@gmail.com"]
 license = "MIT"
@@ -12,3 +12,13 @@ repository = "https://github.com/MensahPrince/FileSearch"
 [dependencies]
 walkdir = "2.5.0"
 colored = "3"
+regex = "1.11.1"
+
+[package.metadata.rpm]
+package = "fSearch"
+
+[package.metadata.rpm.cargo]
+buildflags = ["--release"]
+
+[package.metadata.rpm.targets]
+fSearch = { path = "/usr/bin/fSearch" }

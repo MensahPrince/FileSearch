@@ -4,10 +4,12 @@ use std::env::current_dir;
 use std::io::{self, Write};
 use parser::{Parser, Command};
 use walkdir::WalkDir;
+use regex::Regex;
 use banner::print_banner;
 use colored::*;
 use std::path::PathBuf;
 use std::fs::File;
+
 
 // Display help menu
 fn help() {
@@ -19,7 +21,9 @@ fn help() {
     println!("  find       ----  Search for a file or directory in any given path");
     println!("  -dir <name>  ----  Used together with \"find\" to search for a directory in the current directory");
     println!("  -f <name>  ----  Used together with \"find\" to search for a file in the current directory");
+    println!("  -regex <pattern>  ----  Used together with \"find\" to search for files matching a regex pattern");
     println!("  -ext <extension>  ----  Used together with \"find\" to search for files with a specific extension in the current directory");
+    println!("  export -> <file>  ----  Export found directories to a file");
 }
 
 // Display current working directory prompt
@@ -102,6 +106,22 @@ fn find_ext(ext: &str, found_paths: &mut Vec<PathBuf>) {
                 }
             }
         }
+}
+
+
+fn find_by_regex(pattern: &str) {
+    let re = Regex::new(pattern).expect("Invalid regex pattern");
+
+    for entry in WalkDir::new(".")
+        .into_iter()
+        .filter_map(Result::ok)
+        .filter(|e| e.file_type().is_file())
+    {
+        let file_name = entry.file_name().to_string_lossy();
+        if re.is_match(&file_name) {
+            println!("Matched: {}", entry.path().display());
+        }
+    }
 }
 
 pub fn export_dirs(found_paths: &Vec<PathBuf>, file_path: &str) {
@@ -213,6 +233,9 @@ fn main() {
             } 
             Command::Export(file) =>{
                 export_dirs(&found_paths, &file);
+            }
+            Command::FindRegex(regex) => {
+                find_by_regex(&regex);
             }
 
         }

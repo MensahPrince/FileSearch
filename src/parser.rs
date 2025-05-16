@@ -6,6 +6,7 @@ pub enum Command {
     FindDir(String),
     FindFile(String),
     FindExt(String),
+    FindRegex(String), 
     Empty(()), // handle empty input
     Invalid(String), // handle unrecognized input
     Export(String),//Allows export of found directories to a file
@@ -36,6 +37,7 @@ impl Parser {
             ["find", "-dir", name ] => Command::FindDir(name.to_string()),
             ["find", "-f", name] => Command::FindFile(name.to_string()),
             ["find", "-ext", ext] => Command::FindExt(ext.to_string()),
+            ["find", "-regex", regex] => Command::FindRegex(regex.to_string()), 
             ["export", "->", file] => Command::Export(file.to_string()),
             ["", ..] => Command::Empty(()),
             [] => Command::Invalid("".to_string()),
