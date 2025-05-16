@@ -1,13 +1,13 @@
-use std::env::current_dir;
-use std::io::{self, Write};
-//use std::fs::Metadata;
-
 mod parser;
 mod banner;
+use std::env::current_dir;
+use std::io::{self, Write};
 use parser::{Parser, Command};
 use walkdir::WalkDir;
 use banner::print_banner;
 use colored::*;
+use std::path::PathBuf;
+use std::fs::File;
 
 // Display help menu
 fn help() {
@@ -30,9 +30,10 @@ fn curr_dir_rtn() {
     io::stdout().flush().unwrap();
 }
 
-fn fnd_file(name: &str){
+fn fnd_file(name: &str) -> Vec<PathBuf>{
     //A path variable to hold the path of the current (parent) dir
     let curr_dir = std::env::current_dir().unwrap();
+    let  mut found: Vec<PathBuf> = Vec::new();
 
     //For loop: to loop through the children dirs of the parent dir (curr_dir)
     for entry in WalkDir::new(curr_dir)
@@ -46,12 +47,14 @@ fn fnd_file(name: &str){
             if let Some(file_name) = entry.file_name().to_str(){
                 if file_name == name {
                     println!("Found file: {}", entry.path().display());
+                    found.push(entry.path().to_path_buf());
                 }
             }
         }
+    found
 }
 //A function to find a child directory in its parent dir.
-fn fnd_dir(name: &str){
+fn fnd_dir(name: &str, found_paths: &mut Vec<PathBuf>){
     //A path variable to hold the path of the current (parent) dir
     let curr_dir = std::env::current_dir().unwrap();
 
@@ -67,6 +70,7 @@ fn fnd_dir(name: &str){
             if let Some(dir_name) = entry.file_name().to_str(){
                 if dir_name == name {
                     println!("Found directory: {}", entry.path().display());
+                    found_paths.push(entry.path().to_path_buf());
                 }
             }
         }
@@ -78,7 +82,7 @@ fn no_cmd(_: ()) {
     */
 }
 
-fn find_ext(ext: &str) {
+fn find_ext(ext: &str, found_paths: &mut Vec<PathBuf>) {
     //A path variable to hold the path of the current (parent) dir
     let curr_dir = std::env::current_dir().unwrap();
 
@@ -94,12 +98,31 @@ fn find_ext(ext: &str) {
             if let Some(file_name) = entry.file_name().to_str(){
                 if file_name.ends_with(ext) {
                     println!("Found file with extension {}: {}", ext, entry.path().display());
+                    found_paths.push(entry.path().to_path_buf());
                 }
             }
         }
 }
 
+pub fn export_dirs(found_paths: &Vec<PathBuf>, file_path: &str) {
+    match File::create(file_path) {
+        Ok(mut exfile) => {
+            for path in found_paths {
+                if let Err(e) = writeln!(exfile, "{}", path.display()) {
+                    println!("Failed to write to file: {}", e);
+                    return;
+                }
+            }
+            println!("Successfully exported paths to {}", file_path);
+        }
+        Err(e) => {
+            println!("Failed to create file '{}': {}", file_path, e);
+        }
+    }
+}
+
 fn main() {
+    let mut found_paths: Vec<PathBuf> = Vec::new(); 
     //Print the banner
     print_banner();
     //Parser Instance & initialization
@@ -170,7 +193,7 @@ fn main() {
 
             }
             Command::FindDir(name) => {
-                fnd_dir(&name);
+                fnd_dir(&name, &mut found_paths);
             }
             Command::Empty(_) => {
                 //Do nothing if the input is empty
@@ -186,8 +209,12 @@ fn main() {
                 fnd_file(&name);
             }
             Command::FindExt(ext) => {
-                find_ext(&ext);
+                find_ext(&ext, &mut found_paths);
             } 
+            Command::Export(file) =>{
+                export_dirs(&found_paths, &file);
+            }
+
         }
     }
 }
