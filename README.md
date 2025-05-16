@@ -26,7 +26,7 @@ Run the project: cargo run.
 
 ## Phase 2: CLI Enhancements (v0.2.0)
 
-- Add support for filtering by file extension
+- Add support for filtering by file extension ✅
 - Add regex-based search for file names
-- Export results to a text file 
+- Export results to a text file ✅
 - Add colored output for files/folders ✅
