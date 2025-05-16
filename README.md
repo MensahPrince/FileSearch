@@ -19,7 +19,7 @@
 [dependencies]
 walkdir = "2.5.0"
 colored = "3"
-regex = "1.11.1
+regex = "1.11.1"
 ```
 Build the project: cargo build. 
 
