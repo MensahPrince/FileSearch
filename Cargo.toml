@@ -13,3 +13,12 @@ repository = "https://github.com/MensahPrince/FileSearch"
 walkdir = "2.5.0"
 colored = "3"
 regex = "1.11.1"
+
+[package.metadata.rpm]
+package = "fSearch"
+
+[package.metadata.rpm.cargo]
+buildflags = ["--release"]
+
+[package.metadata.rpm.targets]
+fSearch = { path = "/usr/bin/fSearch" }
