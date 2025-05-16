@@ -1,25 +1,35 @@
 use colored::*;
 
 pub fn print_banner() {
-    let wide_line = ".';:ccccccccccccccccc:;,.".bright_cyan().bold();
-    let short_line = ".';:ccccc:;,.".bright_cyan().bold();
+    let wide_line = ".';:ccccccccccccccccc:;,.";
+    let short_line = ".';:ccccc:;,.";
+    
+    let wide = wide_line.bright_cyan().bold();
+    let short = short_line.bright_cyan().bold();
+    
+    let title = "Simple CLI File Search Tool".bright_white().bold();
+    let author = "Made with Rust ❤️".bright_red().bold();
+    let version = "v0.2.0".bright_yellow().bold();
 
-    println!("{}          {}", wide_line, "Simple CLI File Search Tool".bright_white());
-    println!("{}          {}", wide_line, "    Made with Rust ❤️".bright_red());
-
-    let pattern = [
-        short_line.clone(),
-        short_line.clone(),
-        wide_line.clone(),
-        wide_line.clone(),
-        short_line.clone(),
-        short_line.clone(),
-        short_line.clone(),
-        short_line.clone(),
-        short_line.clone(),
+    // Create a banner block
+    let banner = vec![
+        wide.clone(),
+        wide.clone(),
+        short.clone(),
+        short.clone(),
+        wide.clone(),
+        wide.clone(),
+        format!("{}                        {}", short, title).bright_cyan().bold(),
+        format!("{}                        {}", short, author).bright_cyan().bold(),
+        format!("{}                        {}", short, version).bright_cyan().bold(),
+        short.clone(),
+        short.clone(),
+        short.clone(),
+        short.clone(),
     ];
 
-    for line in pattern.iter() {
+    // Print the banner
+    for line in banner {
         println!("{}", line);
     }
 }
