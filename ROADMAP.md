@@ -23,7 +23,6 @@ This roadmap outlines the planned features and development milestones for the Wa
 ## Phase 3: CLI UX & Config (v0.3.0)
 - Add interactive mode (optional prompts for path, filters)  
 - Add a config file or command-line flags for customization  
-- Improved error reporting and logging
 
 ---
 
