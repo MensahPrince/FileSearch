@@ -141,8 +141,48 @@ pub fn export_dirs(found_paths: &Vec<PathBuf>, file_path: &str) {
     }
 }
 
+fn filter_by(filter_type: &str) {
+    match filter_type {
+        "empty" => {
+            for entry in WalkDir::new(".")
+                .into_iter()
+                .filter_map(Result::ok)
+                .filter(|e| e.file_type().is_dir()) {
+                    if std::fs::read_dir(entry.path()).map(|mut i| i.next().is_none()).unwrap_or(false) {
+                        println!("Empty directory: {}", entry.path().display());
+                    }
+            }
+        }
+        "nonempty" => {
+            for entry in WalkDir::new(".")
+                .into_iter()
+                .filter_map(Result::ok)
+                .filter(|e| e.file_type().is_dir()) {
+                    if std::fs::read_dir(entry.path()).map(|mut i| i.next().is_some()).unwrap_or(false) {
+                        println!("Non-empty directory: {}", entry.path().display());
+                    }
+            }
+        }
+        "hidden" => {
+            for entry in WalkDir::new(".")
+                .into_iter()
+                .filter_map(Result::ok) {
+                    if let Some(name) = entry.file_name().to_str() {
+                        if name.starts_with('.') {
+                            println!("Hidden: {}", entry.path().display());
+                        }
+                    }
+            }
+        }
+        _ => {
+            println!("Unknown filter type: '{}'", filter_type);
+        }
+    }
+}
+
+
 fn main() {
-    let mut found_paths: Vec<PathBuf> = Vec::new(); 
+    let mut found_paths: Vec<PathBuf> = Vec::new();
     //Print the banner
     print_banner();
     //Parser Instance & initialization
@@ -200,6 +240,10 @@ fn main() {
                             //conditional formatting: green if the entry is a directory, otherwise default color
                             if entry.metadata().unwrap().is_dir(){
                                 println!("{}", dir_color.green().bold());
+                            }else if let Some(name) = entry.file_name().to_str() {
+                                if name.starts_with('.') {
+                                     println!("{}", dir_color.red().bold());
+                                }
                             }else{
                                 println!("{}", dir_color);
                             }
@@ -236,6 +280,9 @@ fn main() {
             }
             Command::FindRegex(regex) => {
                 find_by_regex(&regex);
+            }
+            Command::FilterBy(filter_type) => {
+                filter_by(&filter_type);
             }
 
         }
