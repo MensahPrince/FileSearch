@@ -24,6 +24,8 @@ fn help() {
     println!("  -regex <pattern>  ----  Used together with \"find\" to search for files matching a regex pattern");
     println!("  -ext <extension>  ----  Used together with \"find\" to search for files with a specific extension in the current directory");
     println!("  export -> <file>  ----  Export found directories to a file");
+    println!("  filter -type -dir <filter_type>  ----  Filter directories by type (empty, non-empty, hidden)");
+
 }
 
 // Display current working directory prompt
@@ -34,6 +36,30 @@ fn curr_dir_rtn() {
     io::stdout().flush().unwrap();
 }
 
+fn find_by(handle: &str, name: &str, found_paths: &mut Vec<PathBuf>) {
+    // Check if the handle is for a file or directory
+    match handle {
+        "-f" | "-file" => {
+            fnd_file(name);
+        }
+        "-dir" | "-directory" => {
+            fnd_dir(name, found_paths);
+        }
+        "-regex" => {
+            find_by_regex(name);
+        }
+        "-ext" => {
+            find_ext(name, found_paths);
+        }
+        _ => {
+            println!("Invalid handle: {}", handle);
+            println!("Use -f for file, -dir for directory, -regex for regex search, or -ext for extension search.");
+            println!("Example: find -f filename.txt or find -dir dirname or find -regex 'pattern' or find -ext .txt");
+            return;
+        
+    }
+    }
+}
 fn fnd_file(name: &str) -> Vec<PathBuf>{
     //A path variable to hold the path of the current (parent) dir
     let curr_dir = std::env::current_dir().unwrap();
@@ -59,6 +85,7 @@ fn fnd_file(name: &str) -> Vec<PathBuf>{
 }
 //A function to find a child directory in its parent dir.
 fn fnd_dir(name: &str, found_paths: &mut Vec<PathBuf>){
+   
     //A path variable to hold the path of the current (parent) dir
     let curr_dir = std::env::current_dir().unwrap();
 
@@ -70,14 +97,14 @@ fn fnd_dir(name: &str, found_paths: &mut Vec<PathBuf>){
         .filter_map(Result::ok)
         //Creates an iterator which uses a closure to determine if an element should be yielded.
         .filter(|e| e.file_type().is_dir())
-        {
-            if let Some(dir_name) = entry.file_name().to_str(){
-                if dir_name == name {
-                    println!("Found directory: {}", entry.path().display());
-                    found_paths.push(entry.path().to_path_buf());
-                }
+    {
+        if let Some(dir_name) = entry.file_name().to_str(){
+            if dir_name == name {
+                println!("Found directory: {}", entry.path().display());
+                found_paths.push(entry.path().to_path_buf());
             }
         }
+    }
 }
 
 fn no_cmd(_: ()) {
@@ -141,8 +168,48 @@ pub fn export_dirs(found_paths: &Vec<PathBuf>, file_path: &str) {
     }
 }
 
+fn filter_by(filter_type: &str) {
+    match filter_type {
+        "empty" => {
+            for entry in WalkDir::new(".")
+                .into_iter()
+                .filter_map(Result::ok)
+                .filter(|e| e.file_type().is_dir()) {
+                    if std::fs::read_dir(entry.path()).map(|mut i| i.next().is_none()).unwrap_or(false) {
+                        println!("Empty directory: {}", entry.path().display());
+                    }
+            }
+        }
+        "nonempty" => {
+            for entry in WalkDir::new(".")
+                .into_iter()
+                .filter_map(Result::ok)
+                .filter(|e| e.file_type().is_dir()) {
+                    if std::fs::read_dir(entry.path()).map(|mut i| i.next().is_some()).unwrap_or(false) {
+                        println!("Non-empty directory: {}", entry.path().display());
+                    }
+            }
+        }
+        "hidden" => {
+            for entry in WalkDir::new(".")
+                .into_iter()
+                .filter_map(Result::ok) {
+                    if let Some(name) = entry.file_name().to_str() {
+                        if name.starts_with('.') {
+                            println!("Hidden: {}", entry.path().display());
+                        }
+                    }
+            }
+        }
+        _ => {
+            println!("Unknown filter type: '{}'", filter_type);
+        }
+    }
+}
+
+
 fn main() {
-    let mut found_paths: Vec<PathBuf> = Vec::new(); 
+    let mut found_paths: Vec<PathBuf> = Vec::new();
     //Print the banner
     print_banner();
     //Parser Instance & initialization
@@ -200,6 +267,10 @@ fn main() {
                             //conditional formatting: green if the entry is a directory, otherwise default color
                             if entry.metadata().unwrap().is_dir(){
                                 println!("{}", dir_color.green().bold());
+                            }else if let Some(name) = entry.file_name().to_str() {
+                                if name.starts_with('.') {
+                                     println!("{}", dir_color.red().bold());
+                                }
                             }else{
                                 println!("{}", dir_color);
                             }
@@ -212,8 +283,9 @@ fn main() {
                 }
 
             }
-            Command::FindDir(name) => {
-                fnd_dir(&name, &mut found_paths);
+            Command::FindBy(handle, name) => {
+                // Call the find_by function with the handle and name
+                find_by(&handle, &name, &mut found_paths);
             }
             Command::Empty(_) => {
                 //Do nothing if the input is empty
@@ -225,17 +297,11 @@ fn main() {
                 // Print an error message for the unrecognized command
                 println!("fsearch: Unknown command '{}'", cmd);
             }
-            Command::FindFile(name) => {
-                fnd_file(&name);
+            Command::FilterBy(filter_type) => {
+                filter_by(&filter_type);
             }
-            Command::FindExt(ext) => {
-                find_ext(&ext, &mut found_paths);
-            } 
             Command::Export(file) =>{
                 export_dirs(&found_paths, &file);
-            }
-            Command::FindRegex(regex) => {
-                find_by_regex(&regex);
             }
 
         }
