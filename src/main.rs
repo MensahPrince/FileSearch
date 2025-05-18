@@ -209,7 +209,6 @@ fn filter_by(filter_type: &str) {
 
 
 fn main() {
-     env_logger::init(); // Initialize the logger
     let mut found_paths: Vec<PathBuf> = Vec::new();
     //Print the banner
     print_banner();
