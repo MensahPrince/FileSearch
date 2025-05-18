@@ -24,6 +24,8 @@ fn help() {
     println!("  -regex <pattern>  ----  Used together with \"find\" to search for files matching a regex pattern");
     println!("  -ext <extension>  ----  Used together with \"find\" to search for files with a specific extension in the current directory");
     println!("  export -> <file>  ----  Export found directories to a file");
+    println!("  filter -type -dir <filter_type>  ----  Filter directories by type (empty, non-empty, hidden)");
+
 }
 
 // Display current working directory prompt
@@ -51,6 +53,8 @@ fn find_by(handle: &str, name: &str, found_paths: &mut Vec<PathBuf>) {
         }
         _ => {
             println!("Invalid handle: {}", handle);
+            println!("Use -f for file, -dir for directory, -regex for regex search, or -ext for extension search.");
+            println!("Example: find -f filename.txt or find -dir dirname or find -regex 'pattern' or find -ext .txt");
             return;
         
     }
