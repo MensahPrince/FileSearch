@@ -296,16 +296,6 @@ fn main() {
                 // Print an error message for the unrecognized command
                 println!("fsearch: Unknown command '{}'", cmd);
             }
-            /* Command::FindFile(name) => {
-                fnd_file(&name);
-            }
-            Command::FindExt(ext) => {
-                find_ext(&ext, &mut found_paths);
-            } 
-            
-            Command::FindRegex(regex) => {
-                find_by_regex(&regex);
-            } */
             Command::FilterBy(filter_type) => {
                 filter_by(&filter_type);
             }
