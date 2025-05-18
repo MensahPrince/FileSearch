@@ -33,6 +33,5 @@ Run the project: cargo run.
 - Add colored output for files/folders ✅
 
 ## Phase 3: CLI UX & Config (v0.3.0)
-- Add interactive mode (optional prompts for path, filters)  
+- Add interactive mode (optional prompts for path, filters)  ✅
 - Add a config file or command-line flags for customization  
-- Improved error reporting and logging
