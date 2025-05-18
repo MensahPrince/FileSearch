@@ -85,6 +85,7 @@ fn fnd_file(name: &str) -> Vec<PathBuf>{
 }
 //A function to find a child directory in its parent dir.
 fn fnd_dir(name: &str, found_paths: &mut Vec<PathBuf>){
+   
     //A path variable to hold the path of the current (parent) dir
     let curr_dir = std::env::current_dir().unwrap();
 
@@ -96,14 +97,14 @@ fn fnd_dir(name: &str, found_paths: &mut Vec<PathBuf>){
         .filter_map(Result::ok)
         //Creates an iterator which uses a closure to determine if an element should be yielded.
         .filter(|e| e.file_type().is_dir())
-        {
-            if let Some(dir_name) = entry.file_name().to_str(){
-                if dir_name == name {
-                    println!("Found directory: {}", entry.path().display());
-                    found_paths.push(entry.path().to_path_buf());
-                }
+    {
+        if let Some(dir_name) = entry.file_name().to_str(){
+            if dir_name == name {
+                println!("Found directory: {}", entry.path().display());
+                found_paths.push(entry.path().to_path_buf());
             }
         }
+    }
 }
 
 fn no_cmd(_: ()) {
@@ -208,6 +209,7 @@ fn filter_by(filter_type: &str) {
 
 
 fn main() {
+     env_logger::init(); // Initialize the logger
     let mut found_paths: Vec<PathBuf> = Vec::new();
     //Print the banner
     print_banner();
