@@ -34,6 +34,28 @@ fn curr_dir_rtn() {
     io::stdout().flush().unwrap();
 }
 
+fn find_by(handle: &str, name: &str, found_paths: &mut Vec<PathBuf>) {
+    // Check if the handle is for a file or directory
+    match handle {
+        "-f" | "-file" => {
+            fnd_file(name);
+        }
+        "-dir" | "-directory" => {
+            fnd_dir(name, found_paths);
+        }
+        "-regex" => {
+            find_by_regex(name);
+        }
+        "-ext" => {
+            find_ext(name, found_paths);
+        }
+        _ => {
+            println!("Invalid handle: {}", handle);
+            return;
+        
+    }
+    }
+}
 fn fnd_file(name: &str) -> Vec<PathBuf>{
     //A path variable to hold the path of the current (parent) dir
     let curr_dir = std::env::current_dir().unwrap();
@@ -256,8 +278,9 @@ fn main() {
                 }
 
             }
-            Command::FindDir(name) => {
-                fnd_dir(&name, &mut found_paths);
+            Command::FindBy(handle, name) => {
+                // Call the find_by function with the handle and name
+                find_by(&handle, &name, &mut found_paths);
             }
             Command::Empty(_) => {
                 //Do nothing if the input is empty
@@ -269,20 +292,21 @@ fn main() {
                 // Print an error message for the unrecognized command
                 println!("fsearch: Unknown command '{}'", cmd);
             }
-            Command::FindFile(name) => {
+            /* Command::FindFile(name) => {
                 fnd_file(&name);
             }
             Command::FindExt(ext) => {
                 find_ext(&ext, &mut found_paths);
             } 
-            Command::Export(file) =>{
-                export_dirs(&found_paths, &file);
-            }
+            
             Command::FindRegex(regex) => {
                 find_by_regex(&regex);
-            }
+            } */
             Command::FilterBy(filter_type) => {
                 filter_by(&filter_type);
+            }
+            Command::Export(file) =>{
+                export_dirs(&found_paths, &file);
             }
 
         }

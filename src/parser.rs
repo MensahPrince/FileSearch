@@ -3,10 +3,10 @@
 pub enum Command {
     Cd(String),
     Ls,
-    FindDir(String),
-    FindFile(String),
-    FindExt(String),
-    FindRegex(String), 
+    FindBy(String, String),
+    //FindFile(String),
+    //FindExt(String),
+    //FindRegex(String), 
     FilterBy(String), 
     Empty(()), // handle empty input
     Invalid(String), // handle unrecognized input
@@ -35,10 +35,10 @@ impl Parser {
         match tokens.as_slice() {
             ["cd", path] => Command::Cd(path.to_string()),
             ["ls"] => Command::Ls,
-            ["find", "-dir", name ] => Command::FindDir(name.to_string()),
-            ["find", "-f", name] => Command::FindFile(name.to_string()),
-            ["find", "-ext", ext] => Command::FindExt(ext.to_string()),
-            ["find", "-regex", regex] => Command::FindRegex(regex.to_string()), 
+            ["find", handler, name ] => Command::FindBy(handler.to_string(), name.to_string()),
+            //["find", "-f", name] => Command::FindFile(name.to_string()),
+            //["find", "-ext", ext] => Command::FindExt(ext.to_string()),
+           // ["find", "-regex", regex] => Command::FindRegex(regex.to_string()), 
             ["export", "->", file] => Command::Export(file.to_string()),
             ["filter", "-type", "-dir", filter_type] => Command::FilterBy(filter_type.to_string()),
             ["", ..] => Command::Empty(()),
