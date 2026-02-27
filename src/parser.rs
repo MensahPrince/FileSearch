@@ -1,14 +1,5 @@
-// Define supported commands
-#[derive(Debug)]
-pub enum Command {
-    Cd(String),
-    Ls,
-    FindBy(String, String),
-    FilterBy(String), 
-    Empty(()), // handle empty input
-    Invalid(String), // handle unrecognized input
-    Export(String),//Allows export of found directories to a file
-}
+use crate::cli::Cli;
+use clap::Parser as ClapParser;
 
 // Parser struct
 pub struct Parser;
@@ -19,25 +10,19 @@ impl Parser {
         Parser
     }
 
-    // Parse a string input and return a Command
-    pub fn parse(&self, input: &str) -> Command {
+    // Parse a string input and return a Result<Cli, clap::Error>
+    pub fn parse(&self, input: &str) -> Result<Cli, clap::Error> {
         let trimmed = input.trim();
 
+        // Map empty input to a special case or just return error
         if trimmed.is_empty() {
-            return Command::Empty(());
+            // We can return a custom error or just use clap's help
+            return ClapParser::try_parse_from(vec!["fsearch", "--help"]);
         }
-        
-        let tokens: Vec<&str> = trimmed.split_whitespace().collect();
 
-        match tokens.as_slice() {
-            ["cd", path] => Command::Cd(path.to_string()),
-            ["ls"] => Command::Ls,
-            ["find", handler, name ] => Command::FindBy(handler.to_string(), name.to_string()),
-            ["export", "->", file] => Command::Export(file.to_string()),
-            ["filter", "-type", "-dir", filter_type] => Command::FilterBy(filter_type.to_string()),
-            ["", ..] => Command::Empty(()),
-            [] => Command::Invalid("".to_string()),
-            [cmd, ..] => Command::Invalid(cmd.to_string()),
-        }
+        let mut words = vec!["fsearch"];
+        words.extend(trimmed.split_whitespace());
+
+        ClapParser::try_parse_from(words)
     }
 }
