@@ -90,11 +90,11 @@ fn fnd_dir(name: &str, found_paths: &mut Vec<PathBuf>) {
         .filter_map(Result::ok)
         .filter(|e| e.file_type().is_dir())
     {
-        if let Some(dir_name) = entry.file_name().to_str()
-            && dir_name == name
-        {
-            println!("Found directory: {}", entry.path().display());
-            found_paths.push(entry.path().to_path_buf());
+        if let Some(dir_name) = entry.file_name().to_str() {
+            if dir_name == name {
+                println!("Found directory: {}", entry.path().display());
+                found_paths.push(entry.path().to_path_buf());
+            }
         }
     }
 }
