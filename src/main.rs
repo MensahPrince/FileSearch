@@ -1,3 +1,3 @@
 fn main() {
-    fSearch::run();
+    fsearch::run();
 }

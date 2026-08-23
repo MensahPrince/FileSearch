@@ -1,7 +1,7 @@
 use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
-#[command(name = "fSearch")]
+#[command(name = "fsearch")]
 #[command(about = "A lightweight CLI tool to search and manage files", long_about = None)]
 pub struct Cli {
     #[command(subcommand)]
